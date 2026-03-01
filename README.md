@@ -90,7 +90,7 @@ CBDT Insight is an **enterprise-grade data platform** designed for organizations
 | Data Lake Format | Delta Lake | 3.0+ | ACID transactions on data lake |
 | Object Storage | S3-compatible | API v4 | Distributed immutable storage |
 | Version Control | Git | 2.40+ | Code and config management |
-| CI/CD | Jenkins HA | 2.387+ | Build, test, deploy pipelines |
+| CI/CD | GitHub Actions | 2.387+ | Build, test, deploy pipelines |
 | Secrets Management | CyberArk PAM | Latest | Privileged access & credential management |
 | Monitoring | Dynatrace | Latest | APM & infrastructure monitoring |
 
@@ -415,7 +415,20 @@ kubectl get all -l app=cbdt-insight-api
 
 # 4. Test the Kubernetes-exposed Endpoint
 curl http://localhost:30080/health
+### 4. Isolated Production VM Deployment
+
+For environments mapped natively to isolated enterprise Linux servers without developer GUI bindings, you can immediately build and release the complete project using a dynamically mapped script. The system leverages `config/parameters.json` specifically enabling dynamic orchestration variables dictating replica scales, python runtimes, Java distributions, and custom node bindings directly pointing into your environment.
+
+```bash
+# Set execute permissions and deploy the isolated architecture natively
+chmod +x scripts/deploy_isolated_vm.sh
+sudo ./scripts/deploy_isolated_vm.sh
 ```
+> **Exposed Ports:** 
+> * API Dashboard: `30080`
+> * Spark UI: `34040`
+> * Spark History Node: `31808`
+> * Dynatrace ActiveGate: `30999`
 
 ---
 
