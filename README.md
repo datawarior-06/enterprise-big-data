@@ -419,6 +419,24 @@ curl http://localhost:30080/health
 
 ---
 
+## Integration Testing & CI/CD
+
+Before any code can be merged into the `main` branch, the platform enforces an automated integration testing pipeline via **GitHub Actions**.
+
+The script `tests/integration/integration_check.py` maps directly to the technical requirements and performs the following verification checks:
+- Python & Java runtime versions
+- Critical Package Versions (Spark, Delta, FastAPI, Kubernetes, CyberArk PAM)
+- Directory structures enforcing the Medallion Architecture pattern
+- Availability of required configuration files (`settings.yaml`)
+
+**Run locally before committing:**
+```bash
+python tests/integration/integration_check.py
+```
+> **Note:** Failed checks will trigger a warning instead of a hard build failure, with exact root causes logged immediately to `tests/integration/integration.log`. The GitHub Actions pipeline will also capture and publish this log securely as a downloadable artifact.
+
+---
+
 ## Contributing
 
 1. **Branch** off `main` with a descriptive name (`feature/bronze-ingestion`)
