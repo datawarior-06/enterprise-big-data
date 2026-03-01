@@ -370,24 +370,51 @@ cbdt-insight/
 
 - Python 3.10+
 - Docker 20.10+
-- Kubernetes 1.28+ (or Minikube for local dev)
-- Apache Spark 3.5+
-- CyberArk PAM (Privileged Access Manager)
-- Git 2.40+
+- Kubernetes 1.28+ (Docker Desktop or Minikube)
+- Java 11+ (for local PySpark)
 
-### Clone the Repository
+### 1. Clone & Setup Python Environment
 
 ```bash
 git clone https://github.com/datawarior-06/enterprise-big-data.git
 cd enterprise-big-data
-```
 
-### Set Up Python Environment
-
-```bash
+# Create and activate virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
-pip install pyspark delta-spark boto3 great_expectations
+
+# Install all dependencies (Spark, Delta, FastAPI, K8s, etc.)
+pip install -r requirements.txt
+```
+
+### 2. Run Local Development Server
+
+The local dev environment spins up a FastAPI dashboard that dynamically orchestrates background Spark jobs and validates configurations.
+
+```bash
+# Set execute permissions and run the deploy script
+chmod +x scripts/deploy_local.sh
+./scripts/deploy_local.sh
+```
+
+> **View Dashboard:** Visit [http://localhost:8080/docs](http://localhost:8080/docs) in your browser.
+
+### 3. Deploy to Local Kubernetes
+
+The platform can be built and orchestrated completely within a local Kubernetes cluster. This simulates our production High Availability (HA) configurations, Liveness/Readiness probes, and resource constraints natively.
+
+```bash
+# 1. Build the Docker Image (includes PySpark & Application API)
+docker build -t cbdt-insight-api:1.0 -f docker/Dockerfile.api .
+
+# 2. Apply K8s Manifests (Deployment & Service)
+kubectl apply -f infra/kubernetes/
+
+# 3. Verify Pod & Service Status
+kubectl get all -l app=cbdt-insight-api
+
+# 4. Test the Kubernetes-exposed Endpoint
+curl http://localhost:30080/health
 ```
 
 ---

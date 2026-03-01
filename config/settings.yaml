@@ -1,0 +1,12 @@
+spark:
+  app_name: "cbdt-insight"
+  master: "local[*]"
+  executor_memory: "2g"
+  driver_memory: "1g"
+
+storage:
+  endpoint: "http://localhost:9000"
+  region: "us-east-1"
+  bronze_bucket: "bronze-layer"
+  silver_bucket: "silver-layer"
+  gold_bucket: "gold-layer"

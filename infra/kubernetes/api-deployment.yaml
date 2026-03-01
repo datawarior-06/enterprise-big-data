@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: cbdt-insight-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cbdt-insight-api
+  template:
+    metadata:
+      labels:
+        app: cbdt-insight-api
+    spec:
+      containers:
+        - name: api-container
+          image: cbdt-insight-api:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_ENV
+              value: "development"
+          # Readiness/liveness probes like in production requirements
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
