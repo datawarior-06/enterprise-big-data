@@ -1,0 +1,26 @@
+{
+    "environment": "production",
+    "deployment": {
+        "replicas": 3
+    },
+    "ports": {
+        "api_internal": 8000,
+        "api_external": 8080,
+        "api_nodeport": 30080,
+        "spark_ui": 4040,
+        "spark_history": 18080,
+        "dynatrace_activegate": 9999
+    },
+    "versions": {
+        "python_package": "python3.10",
+        "java_package": "openjdk-17-jdk",
+        "docker_ce": "latest",
+        "minikube": "latest"
+    },
+    "application": {
+        "spark_master": "k8s://https://kubernetes.default.svc",
+        "storage_endpoint": "https://s3.internal.enterprise",
+        "cyberark_url": "https://pam.internal.enterprise",
+        "log_level": "WARNING"
+    }
+}
