@@ -1,0 +1,50 @@
+# ============================================================
+# CBDT Insight — Enterprise Data Platform
+# Python Requirements (Version 1.0)
+# ============================================================
+
+# -----------------------------------------------------------
+# CORE DATA PROCESSING
+# -----------------------------------------------------------
+pyspark==4.1.1                  # Apache Spark Python API (distributed compute)
+delta-spark==4.1.0              # Delta Lake ACID transactions on data lake
+boto3==1.42.59                  # AWS S3-compatible object storage SDK
+great-expectations==0.18.22     # Data quality validation framework
+pandas==2.3.3                   # Data manipulation & analysis
+numpy==1.26.4                   # Numerical computing
+
+# -----------------------------------------------------------
+# INFRASTRUCTURE & SECRETS
+# -----------------------------------------------------------
+pyaim==1.5.4                    # CyberArk PAM client (secrets management)
+kubernetes==35.0.0              # Kubernetes Python client (cluster management)
+cryptography==46.0.5            # Cryptographic operations (AES-256, TLS)
+requests==2.32.5                # HTTP client for API integrations
+
+# -----------------------------------------------------------
+# MONITORING & OBSERVABILITY
+# -----------------------------------------------------------
+dt==1.2.1                       # Dynatrace SDK
+
+# -----------------------------------------------------------
+# CONFIGURATION & UTILITIES
+# -----------------------------------------------------------
+python-dotenv==1.2.2            # Environment variable management (.env files)
+PyYAML==6.0.3                   # YAML config parsing
+Jinja2==3.1.6                   # Template engine (config generation)
+click==8.3.1                    # CLI framework
+
+# -----------------------------------------------------------
+# TESTING
+# -----------------------------------------------------------
+pytest==9.0.2                   # Test framework
+pytest-cov==7.0.0               # Test coverage reporting
+
+# -----------------------------------------------------------
+# CODE QUALITY & LINTING
+# -----------------------------------------------------------
+black==26.1.0                   # Code formatter (PEP 8)
+flake8==7.3.0                   # Style guide enforcement
+pylint==4.0.5                   # Static code analysis
+mypy==1.19.1                    # Static type checking
+isort==8.0.1                    # Import sorting

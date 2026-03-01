@@ -91,7 +91,7 @@ CBDT Insight is an **enterprise-grade data platform** designed for organizations
 | Object Storage | S3-compatible | API v4 | Distributed immutable storage |
 | Version Control | Git | 2.40+ | Code and config management |
 | CI/CD | Jenkins HA | 2.387+ | Build, test, deploy pipelines |
-| Secrets Management | HashiCorp Vault | 1.15+ | Credential encryption & auto-rotation |
+| Secrets Management | CyberArk PAM | Latest | Privileged access & credential management |
 | Monitoring | Dynatrace | Latest | APM & infrastructure monitoring |
 
 ### Programming Languages
@@ -240,7 +240,7 @@ spark.dynamicAllocation.executorIdleTimeout = 60s
 |---|---|
 | **Least Privilege** | Deny by default, explicitly allow |
 | **Separation of Duties** | Approval chain: peer review → lead → ops |
-| **Privilege Escalation** | Request via Vault + Jira approval + auto-expire |
+| **Privilege Escalation** | Request via CyberArk PAM + Jira approval + auto-expire |
 
 ### RBAC Model
 
@@ -259,7 +259,7 @@ spark.dynamicAllocation.executorIdleTimeout = 60s
 | SSH to Bastion | TOTP + SSH key | Mandatory |
 | Console Login | TOTP or Yubikey | Mandatory |
 | Git commit signing | GPG key | Prod changes only |
-| Vault token | LDAP + TOTP | Every interaction |
+| CyberArk PAM session | LDAP + TOTP | Every interaction |
 
 ### Threat Modeling (STRIDE)
 
@@ -327,9 +327,9 @@ All monitoring flows through **Dynatrace** (deployed in an isolated observabilit
 
 | Communication Type | Protocol | Certificate Authority |
 |---|---|---|
-| Service-to-Service | TLS 1.3 + mTLS | Internal CA (Vault PKI) |
+| Service-to-Service | TLS 1.3 + mTLS | Internal CA (CyberArk PKI) |
 | Client-to-LB | TLS 1.2+ | Public CA (Let's Encrypt / DigiCert) |
-| Database Connection | TLS 1.2+ | Vault CA or DB native certs |
+| Database Connection | TLS 1.2+ | CyberArk CA or DB native certs |
 
 ### Firewall Policy
 
@@ -372,7 +372,7 @@ cbdt-insight/
 - Docker 20.10+
 - Kubernetes 1.28+ (or Minikube for local dev)
 - Apache Spark 3.5+
-- HashiCorp Vault 1.15+
+- CyberArk PAM (Privileged Access Manager)
 - Git 2.40+
 
 ### Clone the Repository
@@ -408,7 +408,7 @@ pip install pyspark delta-spark boto3 great_expectations
 |---|---|---|
 | 1 | Architecture review & approval | Month 1 |
 | 2 | Detailed implementation roadmap (12-month plan) | Month 1–2 |
-| 3 | Infrastructure provisioning (K8s, Vault, Dynatrace) | Month 2–4 |
+| 3 | Infrastructure provisioning (K8s, CyberArk PAM, Dynatrace) | Month 2–4 |
 | 4 | Bronze layer ingestion pipelines | Month 3–5 |
 | 5 | Silver layer transformation & data quality | Month 5–7 |
 | 6 | Gold layer aggregates & BI integration | Month 7–9 |
