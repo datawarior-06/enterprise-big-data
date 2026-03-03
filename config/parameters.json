@@ -1,26 +1,45 @@
 {
-    "environment": "production",
-    "deployment": {
-        "replicas": 3
+    "pipeline": {
+        "run_date": null,
+        "env": "staging",
+        "log_level": "INFO",
+        "modules": [
+            "module1",
+            "module2",
+            "module3"
+        ],
+        "fail_fast": true,
+        "max_retries": 3,
+        "retry_delay_seconds": 30
     },
-    "ports": {
-        "api_internal": 8000,
-        "api_external": 8080,
-        "api_nodeport": 30080,
-        "spark_ui": 4040,
-        "spark_history": 18080,
-        "dynatrace_activegate": 9999
+    "spark": {
+        "master": "local[*]",
+        "driver_memory": "4g",
+        "executor_memory": "8g",
+        "executor_cores": 4,
+        "shuffle_partitions": 200,
+        "adaptive_enabled": true
     },
-    "versions": {
-        "python_package": "python3.10",
-        "java_package": "openjdk-17-jdk",
-        "docker_ce": "latest",
-        "minikube": "latest"
+    "minio": {
+        "endpoint": "http://minio.internal.company.com:9000",
+        "path_style_access": true,
+        "bucket_bronze": "bronze",
+        "bucket_silver": "silver",
+        "bucket_gold": "gold"
     },
-    "application": {
-        "spark_master": "k8s://https://kubernetes.default.svc",
-        "storage_endpoint": "https://s3.internal.enterprise",
-        "cyberark_url": "https://pam.internal.enterprise",
-        "log_level": "WARNING"
+    "postgres": {
+        "host": "db.internal.company.com",
+        "port": 5432,
+        "database": "oltp_db",
+        "fetch_size": 10000
+    },
+    "delta": {
+        "vacuum_retention_hours": 168,
+        "optimize_target_file_size": 134217728,
+        "merge_schema": false
+    },
+    "dynatrace": {
+        "enabled": true,
+        "cluster_id": "spark-pipeline-prod"
     }
 }

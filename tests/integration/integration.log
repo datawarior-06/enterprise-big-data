@@ -1,0 +1,23 @@
+2026-03-02 01:01:00,721 - INFO - ==================================================
+2026-03-02 01:01:00,721 - INFO - STARTING PLATFORM INTEGRATION & COMPLIANCE CHECKS
+2026-03-02 01:01:00,721 - INFO - ==================================================
+2026-03-02 01:01:00,721 - INFO - ✅ Python version check passed.
+2026-03-02 01:01:01,017 - INFO - ✅ Java installation check passed.
+2026-03-02 01:01:01,545 - INFO - ✅ Package pyspark check passed (Found: 4.1.1).
+2026-03-02 01:01:01,551 - INFO - ✅ Package delta check passed (Found: 4.1.0).
+2026-03-02 01:01:01,860 - INFO - ✅ Package boto3 check passed (Found: 1.42.59).
+2026-03-02 01:01:01,863 - INFO - ✅ Package pyaim check passed (Found: unknown).
+2026-03-02 01:01:02,337 - INFO - ✅ Package kubernetes check passed (Found: 35.0.0).
+2026-03-02 01:01:02,608 - INFO - ✅ Package fastapi check passed (Found: 0.135.1).
+2026-03-02 01:01:02,608 - INFO - ✅ Directory structure check passed: src/ingestion
+2026-03-02 01:01:02,609 - INFO - ✅ Directory structure check passed: src/transformation
+2026-03-02 01:01:02,609 - INFO - ✅ Directory structure check passed: src/aggregation
+2026-03-02 01:01:02,609 - INFO - ✅ Directory structure check passed: src/common
+2026-03-02 01:01:02,609 - INFO - ✅ Directory structure check passed: src/api
+2026-03-02 01:01:02,609 - INFO - ✅ Directory structure check passed: infra/kubernetes
+2026-03-02 01:01:02,609 - INFO - ✅ Directory structure check passed: docker
+2026-03-02 01:01:02,610 - INFO - ✅ Directory structure check passed: config
+2026-03-02 01:01:02,610 - INFO - ✅ Configuration file check passed.
+2026-03-02 01:01:02,610 - INFO - ==================================================
+2026-03-02 01:01:02,610 - INFO - INTEGRATION CHECKS COMPLETE. See integration.log for any warnings.
+2026-03-02 01:01:02,610 - INFO - ==================================================
