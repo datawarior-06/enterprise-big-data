@@ -84,32 +84,31 @@ CBDT Insight is an **enterprise-grade data platform** designed for organizations
 
 | Component | Tool | Version | Purpose |
 |---|---|---|---|
-| Containerization | Docker | 20.10+ | Package apps with dependencies |
-| Orchestration | Kubernetes | 1.28+ | Manage containers at scale |
-| Compute Engine | Apache Spark | 3.5+ | Distributed data processing |
-| Data Lake Format | Delta Lake | 3.0+ | ACID transactions on data lake |
-| Object Storage | S3-compatible | API v4 | Distributed immutable storage |
-| Version Control | Git | 2.40+ | Code and config management |
-| CI/CD | GitHub Actions | 2.387+ | Build, test, deploy pipelines |
-| Secrets Management | CyberArk PAM | Latest | Privileged access & credential management |
-| Monitoring | Dynatrace | Latest | APM & infrastructure monitoring |
+| Containerization | Podman | 4.0+ | Multi-stage image builds matching UBI9 |
+| Orchestration | GitHub Actions | Varies | CI/CD pipelines and deployment automation |
+| Compute Engine | Apache Spark | 3.5.1 | Distributed data processing |
+| Data Lake Format | Delta Lake | 3.2.0 | ACID transactions on data lake |
+| Object Storage | MinIO / S3 | API v4 | Distributed immutable storage (Bronze/Silver/Gold) |
+| Relational Source | PostgreSQL | 14+ | OLTP Database Source |
+| Secrets Management | CyberArk PAM | Latest | Privileged access via Hashicorp Vault Client Interface |
+| Monitoring | Dynatrace | Latest | APM & infrastructure monitoring via OneAgent |
 
 ### Programming Languages
 
 | Language | Version | Use Case |
 |---|---|---|
-| Python | 3.10+ | Data processing, Spark jobs, orchestration |
-| SQL | ANSI SQL-2016 | Data querying, ETL transformations |
-| Bash | 4.0+ (POSIX) | Infrastructure scripts, CI/CD pipelines |
+| Python | 3.11+ | Data processing, Spark jobs, orchestration |
+| Java | 21 | JVM runtime mapped for PySpark |
 
 ### Python Libraries
 
 | Library | Version | Function |
 |---|---|---|
-| `pyspark` | 3.5+ | Spark API in Python |
-| `delta-spark` | 3.0+ | Delta Lake ACID operations |
-| `boto3` | 1.26+ | S3-compatible storage SDK |
-| `great_expectations` | 0.17+ | Data quality validation framework |
+| `pyspark` | 3.5.1 | Spark API in Python |
+| `delta-spark` | 3.2.0 | Delta Lake ACID operations |
+| `boto3` | 1.34+ | S3-compatible storage SDK |
+| `pyaim` | 1.0+ | CyberArk PAM integration |
+| `pytest` | 8.3+ | Primary testing framework suite covering Unit & Integration |
 
 ---
 
@@ -343,23 +342,22 @@ All monitoring flows through **Dynatrace** (deployed in an isolated observabilit
 ## Project Structure
 
 ```
-cbdt-insight/
-├── README.md                          # This file
-├── docs/
-│   └── requirements/
-│       └── Enterprise_Data_Platform_Technical_Requirements.docx
-├── src/                               # Application source code (planned)
-│   ├── ingestion/                     # Bronze layer ingestion jobs
-│   ├── transformation/                # Silver layer cleaning & validation
-│   ├── aggregation/                   # Gold layer curated aggregates
-│   └── common/                        # Shared utilities & configs
-├── infra/                             # Infrastructure-as-Code (planned)
-│   ├── kubernetes/                    # K8s manifests & Helm charts
-│   ├── docker/                        # Dockerfiles
-│   └── terraform/                     # IaC for cloud/on-prem provisioning
-├── pipelines/                         # CI/CD pipeline definitions (planned)
-├── tests/                             # Unit & integration tests (planned)
-└── runbooks/                          # DR playbooks & operational docs (planned)
+spark-medallion-pipeline/                  
+├── .github/workflows/                     # CI/CD Github Actions pipelines
+├── _commons/                              # [SHARED] Cross-module utilities (Spark sessions, Delta mappings)
+├── config/                                # [GLOBAL] Configuration JSON schemas overriding environments
+├── logs/                                  # [GLOBAL] Structured JSON logging mapping into Dynatrace
+├── vault/                                 # [GLOBAL] Secrets management integrations
+├── module1/                               # [MODULE] Domain module (e.g. Orders)
+│   ├── src/
+│   │   ├── extract/                       # JDBC Extracts from Postgres
+│   │   ├── transform/                     # Bronze & Silver Transforms
+│   │   └── load/                          # Gold Data mapping into MinIO
+│   ├── test/                              # Module-specific unittests & integration testing
+│   ├── config/                            # Module-level variable mapping
+│   └── module-etl-runner.py               # Module Orchestrator Point
+├── main.py                                # [ROOT] Global Pipeline Entry Point
+└── Containerfile                          # Podman Image Specifications
 ```
 
 ---
@@ -368,85 +366,59 @@ cbdt-insight/
 
 ### Prerequisites
 
-- Python 3.10+
-- Docker 20.10+
-- Kubernetes 1.28+ (Docker Desktop or Minikube)
-- Java 11+ (for local PySpark)
+- Python 3.11+
+- Podman 4.0+
+- Java 21 (for local PySpark)
 
-### 1. Clone & Setup Python Environment
+### 1. Set Up Python Environment
 
 ```bash
 git clone https://github.com/datawarior-06/enterprise-big-data.git
 cd enterprise-big-data
 
 # Create and activate virtual environment
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 
-# Install all dependencies (Spark, Delta, FastAPI, K8s, etc.)
+# Install all locked dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Run Local Development Server
+### 2. Local Container Build & Execution
 
-The local dev environment spins up a FastAPI dashboard that dynamically orchestrates background Spark jobs and validates configurations.
+The architecture deploys locally via Podman mirroring the UBI9 RedHat configuration.
 
 ```bash
-# Set execute permissions and run the deploy script
-chmod +x scripts/deploy_local.sh
-./scripts/deploy_local.sh
+# Build the image using the multi-stage Containerfile
+podman build -t spark-medallion:1.0.0 -f Containerfile .
+
+# Launch the orchestrator pipeline manually
+podman run --rm --env-file vault/.env.example -e PIPELINE_ENV=staging --network host spark-medallion:1.0.0
 ```
-
-> **View Dashboard:** Visit [http://localhost:8080/docs](http://localhost:8080/docs) in your browser.
-
-### 3. Deploy to Local Kubernetes
-
-The platform can be built and orchestrated completely within a local Kubernetes cluster. This simulates our production High Availability (HA) configurations, Liveness/Readiness probes, and resource constraints natively.
-
-```bash
-# 1. Build the Docker Image (includes PySpark & Application API)
-docker build -t cbdt-insight-api:1.0 -f docker/Dockerfile.api .
-
-# 2. Apply K8s Manifests (Deployment & Service)
-kubectl apply -f infra/kubernetes/
-
-# 3. Verify Pod & Service Status
-kubectl get all -l app=cbdt-insight-api
-
-# 4. Test the Kubernetes-exposed Endpoint
-curl http://localhost:30080/health
-### 4. Isolated Production VM Deployment
-
-For environments mapped natively to isolated enterprise Linux servers without developer GUI bindings, you can immediately build and release the complete project using a dynamically mapped script. The system leverages `config/parameters.json` specifically enabling dynamic orchestration variables dictating replica scales, python runtimes, Java distributions, and custom node bindings directly pointing into your environment.
-
-```bash
-# Set execute permissions and deploy the isolated architecture natively
-chmod +x scripts/deploy_isolated_vm.sh
-sudo ./scripts/deploy_isolated_vm.sh
-```
-> **Exposed Ports:** 
-> * API Dashboard: `30080`
-> * Spark UI: `34040`
-> * Spark History Node: `31808`
-> * Dynatrace ActiveGate: `30999`
 
 ---
 
-## Integration Testing & CI/CD
+## Technical Testing & Execution Details
 
-Before any code can be merged into the `main` branch, the platform enforces an automated integration testing pipeline via **GitHub Actions**.
+### Testing Standards
 
-The script `tests/integration/integration_check.py` maps directly to the technical requirements and performs the following verification checks:
-- Python & Java runtime versions
-- Critical Package Versions (Spark, Delta, FastAPI, Kubernetes, CyberArk PAM)
-- Directory structures enforcing the Medallion Architecture pattern
-- Availability of required configuration files (`settings.yaml`)
+- All components are verified via Pytest ensuring minimum code coverage standards.
+- CI/CD will immediately reject pipelines falling below `85%` test coverage.
 
-**Run locally before committing:**
 ```bash
-python tests/integration/integration_check.py
+# Run unit tests
+python -m pytest module*/test/extract/ module*/test/transform/ module*/test/load/ -v
+
+# Run Integration testing linking against MinIO structures
+python -m pytest module*/test/integration.py -v -m integration
 ```
-> **Note:** Failed checks will trigger a warning instead of a hard build failure, with exact root causes logged immediately to `tests/integration/integration.log`. The GitHub Actions pipeline will also capture and publish this log securely as a downloadable artifact.
+
+### Code Formatting Defaults
+Pre-commit hooks strictly govern styling constraints.
+```bash
+# Lint Checks
+black --check . && flake8 . && isort --check-only .
+```
 
 ---
 
